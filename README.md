@@ -71,7 +71,7 @@ AWS Cloud를 활용한 Kubernetes 클러스터 구축 및 프라이빗 서브넷
     }
     ```
 
-    > ALB에 2개 퍼블릭 서브넷 할당
+    > - ALB에 2개 퍼블릭 서브넷 할당
 
   - Private Subnet은 EC2와 같은 리소스가 NAT를 통해 외부 통신하는 용도
   - Private Subnet에서 외부 통신 시 같은 Zone의 NAT를 이용
@@ -88,8 +88,8 @@ AWS Cloud를 활용한 Kubernetes 클러스터 구축 및 프라이빗 서브넷
     }
     ```
 
-    > NAT 게이트웨이(`enable_nat_gateway`) 활성화  
-    > 가용 영역 별로 이원화된 서브넷에서 개별 NAT 게이트웨이로 통신하기 위해 `single_nat_gateway` 비활성화 및 `one_nat_gateway_per_az` 활성화
+    > - NAT 게이트웨이(`enable_nat_gateway`) 활성화  
+    > - 가용 영역 별로 이원화된 서브넷에서 개별 NAT 게이트웨이로 통신하기 위해 `single_nat_gateway` 비활성화 및 `one_nat_gateway_per_az` 활성화
   
 ### 3. Amazon EKS의 관리형 노드는 각각의 Private Subnet에 위치
 
@@ -115,7 +115,7 @@ module "eks" {
 }
 ```
 
-> 각 노드그룹에 서로 다른 가용영역의 프라이빗 서브넷 ID 할당
+> - 각 노드그룹에 서로 다른 가용영역의 프라이빗 서브넷 ID 할당
 
 ### 4. Deployment에 구성될 Pod는 Spring Boot 이미지로 제작하여 컨테이너 레지스트리에 업로드
 
@@ -140,8 +140,8 @@ resource "kubernetes_deployment" "springboot_app" {
 }
 ```
 
-> `./springboot-docker` 내의 Spring Boot 앱 이미지 빌드 및 Docker Hub 푸쉬  
-> `ggingdev/springboot:latest` 이미지 실행
+> - `./springboot-docker` 내의 Spring Boot 앱 이미지 빌드 및 Docker Hub 푸쉬  
+> - `ggingdev/springboot:latest` 이미지 실행
 
 ### 5. 만들어진 이미지는 affinity 옵션을 통하여 Private Subnet에 전개된 노드에 위치
 
@@ -177,8 +177,8 @@ resource "kubernetes_deployment" "springboot_app" {
 }
 ```
 
-> `required_during_scheduling_ignored_during_execution` 를 통한 affinity 적용  
-> `subnet-type=private` 라벨이 적용된 노드에 affinity 적용
+> - `required_during_scheduling_ignored_during_execution` 를 통한 affinity 적용  
+> - `subnet-type=private` 라벨이 적용된 노드에 affinity 적용
 
 ### 6. Application Load Balancer는 인터넷으로 접근이 가능하며 구성된 Pod로 라우팅
 
@@ -192,7 +192,7 @@ resource "aws_lb" "eks_alb" {
 }
 ```
 
-> 인터넷 접근을 위해 퍼블릭 서브넷에 위치
+> - 인터넷 접근을 위해 퍼블릭 서브넷에 위치
 
 ```terraform
 # main.tf
@@ -222,7 +222,7 @@ resource "aws_lb_listener" "eks_listener_8080" {
 }
 ```
 
-> 80, 8080 포트 인바운드 트래픽을 대상그룹으로 라우팅
+> - 80, 8080 포트 인바운드 트래픽을 대상그룹으로 라우팅
 
 ```terraform
 # main.tf
@@ -238,4 +238,4 @@ resource "aws_security_group_rule" "eks_nodes_ingress_8080" {
 }
 ```
 
-> 8080 포트로 서비스 되는 Spring Boot 앱에 접근하기 위해 EKS 노드 보안그룹에 8080 포트 인바운드 규칙 허용
+> - 8080 포트로 서비스 되는 Spring Boot 앱에 접근하기 위해 EKS 노드 보안그룹에 8080 포트 인바운드 규칙 허용
